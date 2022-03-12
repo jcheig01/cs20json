@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>JSON Song List</title>
+        <link rel="stylesheet" href="friendly.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {
+                background-color: burlywood;
+            }
+        </style>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    </head>
+    <body>
+        <header>
+            <h1>JSON Song List</h1>
+            <hr>
+        </header>
+        <article>
+            <section>
+                <p>Part Two</p>
+                <div class="content">
+                </div>
+                <p>Part Three</p>
+                <div class="content">
+                    <table id="table"></table>
+               </div>
+               <p>Part Four</p>
+               <div class="content">
+                    <label for="genres">Choose a genre:</label>
+
+                    <select name="genres" id="genres">
+                        <option value="Hip Hop">Hip Hop</option>
+                        <option value="R&B">R&B</option>
+                        <option value="Pop">Pop</option>
+                        <option value="Rock">Rock</option>
+                    </select>
+                    <input id="filter" type="submit" value="Filter">
+                    <br>
+                    <table id="table2"></table>
+               </div>
+            </section>
+        </article>
+    </body>
+    <script language="javascript">
+
+        var obj;
+
+        $.getJSON("songlist.json", function(json) {
+
+            obj = json;
+
+            document.getElementsByClassName("content")[0].innerHTML = JSON.stringify(json);
+
+            makeTable("#table");
+            makeTable("#table2");
+
+            function makeTable(selector) {
+                
+                var cols = makeHeaders(json, selector); 
+        
+                for (var i = 0; i < json.length; i++) {
+                    var row = $('<tr/>');  
+                    for (var c = 0; c < cols.length; c++)
+                    {
+                        var val = json[i][cols[c]];
+
+                        if (val == null) val = ""; 
+                            row.append($('<td/>').html(val));
+                    }
+                    
+                    $(selector).append(row);
+                }
+            }
+ 
+            function makeHeaders(json, selector) {
+                var columns = [];
+                var header = $('<tr/>');
+                
+                for (var i = 0; i < json.length; i++) {
+                    var row = json[i];
+                    
+                    for (var k in row) {
+                        if ($.inArray(k, columns) == -1) {
+                            columns.push(k);
+                            
+                            header.append($('<th/>').html(k));
+                        }
+                    }
+                }
+                
+                $(selector).append(header);
+                    return columns;
+            }  
+        });
+
+        $("#filter").click(filterFun);
+
+        function filterFun() {
+            var table = document.getElementById("table2");
+            var tr = table.getElementsByTagName("tr");
+            var filter = document.getElementById("genres").value;
+
+            for (var i = 0; i < tr.length; i++) {
+                var td = tr[i].getElementsByTagName("td")[2];
+
+                if (td) {
+                    var txtValue = td.textContent || td.innerText;
+                    if (txtValue == filter) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                    
+                }
+            }
+
+            $("#table2 td:nth-child(1), #table2 th:nth-child(1), #table2 td:nth-child(3), #table2 th:nth-child(3), #table2 td:nth-child(4), #table2 th:nth-child(4)").hide();
+        }
+
+        
+    </script>
+</html>
